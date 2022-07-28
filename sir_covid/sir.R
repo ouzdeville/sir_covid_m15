@@ -59,17 +59,30 @@ SIR<- function (S,I,R,beta, gamma, n_days){
     Infectes=c(I),
     Retablis=c(R)
   ) 
+  #répéter du premier au dernier jour
   for(day in 1:n_days){
+    #pour chaque day on calculer les valeurs qui suivent
     step_value=SIR_next_step(S,I,R,beta,gamma,N)
+    # S à la premiere position
     S=as.integer(step_value[1])
     I=as.integer(step_value[2])
     R=as.integer(step_value[3])
     # Ajoute lanouvelle ligne à df
     df[nrow(df)+1,]=c(S,I,R)
   }
+  
   return(df)
 }
 
-df=SIR(S,I,R,beta, gamma,160)
+# execution de la fnction SIR 
+Res=SIR(S,I,R,beta, gamma,160)
 
-print(df)
+# Parmi les infectés on y tire les personnes qui ont besoin d'une hospi simple
+hosp=as.integer(Res$Infectes*hosp_rate* market_share)
+# ceux qui ont besoin d'une ventilation
+vent=as.integer(Res$Infectes*vent_rate* market_share)
+# ceux qui ont besoin de soins intensifs
+icu=as.integer(Res$Infectes*icu_rate* market_share)
+
+
+
