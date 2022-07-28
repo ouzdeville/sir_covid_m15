@@ -1,6 +1,6 @@
 current_hosp=4  # le nombre de cas connus
 doubling_time=6 #le temps de dédoublement 6 jours
-distanciation=0 # dépendant des mesures de distanciation sociale
+distanciation=0.1 # dépendant des mesures de distanciation sociale
 hosp_rate=6/100 # taux d'hospitalisation simple
 icu_rate=1/100 # taux de soins intensifs
 vent_rate=3/100 # taux de personnes en ventilation
@@ -55,6 +55,7 @@ SIR<- function (S,I,R,beta, gamma, n_days){
     
   #valeur initiale dans le dateframe df
   df<- data.frame(
+    Days=c(1),
     Sains=c(S),
     Infectes=c(I),
     Retablis=c(R)
@@ -68,14 +69,14 @@ SIR<- function (S,I,R,beta, gamma, n_days){
     I=as.integer(step_value[2])
     R=as.integer(step_value[3])
     # Ajoute lanouvelle ligne à df
-    df[nrow(df)+1,]=c(S,I,R)
+    df[nrow(df)+1,]=c(day+1,S,I,R)
   }
   
   return(df)
 }
-
+n_days=160
 # execution de la fnction SIR 
-Res=SIR(S,I,R,beta, gamma,160)
+Res=SIR(S,I,R,beta, gamma,n_days)
 
 # Parmi les infectés on y tire les personnes qui ont besoin d'une hospi simple
 hosp=as.integer(Res$Infectes*hosp_rate* market_share)
@@ -84,5 +85,36 @@ vent=as.integer(Res$Infectes*vent_rate* market_share)
 # ceux qui ont besoin de soins intensifs
 icu=as.integer(Res$Infectes*icu_rate* market_share)
 
+# On regroupe les valeurs dans un dataframe colonne par colonne
+projection = data.frame(days=Res$Days,
+                        hosp=hosp,
+                        vent=vent,
+                        icu=icu)
 
+#u ligne nulle (0,0,0,0)
+zero=data.frame(
+  days=c(0),
+  hosp=c(0),
+  vent=c(0),
+  icu=c(0)
+) 
 
+#On ajoute zero à la premiere ligne en éliminant la derniere
+decalage=rbind(zero, projection[1:n_days,])
+# les nouveau cas admits chaque jour
+incidents=projection-decalage
+#les valeurs négatives remplacées par des zeros
+incidents[incidents<0 ]=0
+incidents["days"]=1:nrow(incidents)
+
+#Création de la fonction d'affichage
+ plot_cas_incidents<- function(incidents){
+   plot(incidents$days, incidents$hosp, type="l", col="green", xlab="jour", ylab="Nbre Cas")
+   lines(incidents$days, incidents$vent, type="l", col="blue")
+   lines(incidents$days, incidents$icu, type="l", col="red")
+   #legend(1, 200, legend = c("Hosp", "Vent", "Icu"), lwd = c(5,2), col = c("green", "blue", "red") )
+ }
+
+ plot_cas_incidents(incidents)
+ 
+ 
