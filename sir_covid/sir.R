@@ -24,3 +24,25 @@ beta=(growth_rate+gamma)/N # taux de propagation (taux de personnes infectés ap
 beta=beta/(1-distanciation) # taux de personnes infectées après contact en respectant les mesures barières
 R_0=beta/gamma*N # Taux de reproduction de base
 R_1=R_0/(1-distanciation) # Nouveau Taux de reproduction de base après mesures de distantiation sociale
+print(R_1)
+# Ceci est 
+SIR_next_step <- function (S,I,R,beta, gamma, N){
+    St=S-(beta*S*I)
+    It=I+(beta*S*I)-(gamma*I)
+    Rt=R+(gamma*I)
+    if(St < 0){
+      St=0
+    }
+    if(It < 0){
+      It=0
+    }
+    if(Rt < 0){
+      Rt=0
+    }
+  scale=N/(St+Rt+It) # agrandissement
+  St=St*scale
+  It=It*scale
+  Rt=Rt*scale
+  return(c(St,It,Rt))
+}
+SIR_next_step(S,I,R,beta, gamma,N) 
