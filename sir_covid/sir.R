@@ -25,24 +25,51 @@ beta=beta/(1-distanciation) # taux de personnes infectées après contact en res
 R_0=beta/gamma*N # Taux de reproduction de base
 R_1=R_0/(1-distanciation) # Nouveau Taux de reproduction de base après mesures de distantiation sociale
 print(R_1)
-# Ceci est 
+# Ceci est une fonction qui permet de calculer les prochaines valeurs S, I, R 
 SIR_next_step <- function (S,I,R,beta, gamma, N){
-    St=S-(beta*S*I)
-    It=I+(beta*S*I)-(gamma*I)
-    Rt=R+(gamma*I)
-    if(St < 0){
-      St=0
-    }
-    if(It < 0){
-      It=0
-    }
-    if(Rt < 0){
-      Rt=0
-    }
+  # S, I, R sont les valeurs précédentes.
+  # St, It, Rt les valeurs prochaines
+  St=S-(beta*S*I)
+  It=I+(beta*S*I)-(gamma*I)
+  Rt=R+(gamma*I)
+  if(St < 0){
+    St=0
+  }
+  if(It < 0){
+    It=0
+  }
+  if(Rt < 0){
+    Rt=0
+  }
   scale=N/(St+Rt+It) # agrandissement
-  St=St*scale
+  St=St*scale # Ajustement
   It=It*scale
   Rt=Rt*scale
+  print(St+It+Rt)
   return(c(St,It,Rt))
 }
-SIR_next_step(S,I,R,beta, gamma,N) 
+# cette fonction permet de faire une projection sur n_days jours des valeurs de S, I, et R
+SIR<- function (S,I,R,beta, gamma, n_days){
+  # l'idée est de mettre en première ligne les valeurs initiales
+  # on fait une boucle (répétition) pour trouver les prochaines valeurs une à une
+    
+  #valeur initiale dans le dateframe df
+  df<- data.frame(
+    Sains=c(S),
+    Infectes=c(I),
+    Retablis=c(R)
+  ) 
+  for(day in 1:n_days){
+    step_value=SIR_next_step(S,I,R,beta,gamma,N)
+    S=as.integer(step_value[1])
+    I=as.integer(step_value[2])
+    R=as.integer(step_value[3])
+    # Ajoute lanouvelle ligne à df
+    df[nrow(df)+1,]=c(S,I,R)
+  }
+  return(df)
+}
+
+df=SIR(S,I,R,beta, gamma,160)
+
+print(df)
