@@ -101,7 +101,7 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             sliderInput(inputId = "current_hosp",
-                        label =  "Patients COVID-19 actuellement hospitalisés:",
+                        label =  "Patients actuellement hospitalisés:",
                         min=1,
                         max=100,
                         value = current_hosp
@@ -117,7 +117,7 @@ ui <- fluidPage(
                          min=0, max=100, value=distanciation*100, step=5,
             ),
             numericInput(inputId = "hosp_rate", 
-                         label = "Hospitalization %(total infections:",
+                         label = "Hospitalisation %(total infections):",
                          min=0.0, max=100.0, value=hosp_rate*100, step=1.0
             ),
             
@@ -126,30 +126,30 @@ ui <- fluidPage(
                          min=0.0, max=100.0, value=icu_rate*100, step=1.0
             ),
             numericInput(inputId = "vent_rate", 
-                         label = "Ventilated %(total infections):",
+                         label = "Ventilation %(total infections):",
                          min=0.0, max=100.0, value=vent_rate*100, step=1,
             ),
             
             numericInput(inputId = "hosp_los", 
-                         label = "Hospital Length of Stay:",
+                         label = "Durée de séjour en Hospitalisation:",
                          , value=hosp_los, step=1,
             ),
             numericInput(inputId = "icu_los", 
-                         label = "ICU Length of Stay:",
+                         label = "Durée Séjour en soin Intensif ICU:",
                          value=icu_los, step=1,
             ),
             numericInput(inputId = "vent_los", 
-                         label = "Vent Length of Stay:",
+                         label = "Durée Séjour Ventilation:",
                          value=vent_los, step=1,
             ),
             numericInput(inputId = "market_share", 
-                         label =  "Hospital Market Share (%)", 
+                         label =  "Part de Marché Hospitalier (%)", 
                          0.0, 100.0, value=market_share*100, step=1.0
             ),
             
             
             numericInput(inputId = "S", 
-                         label = "Regional Population", value=17000000, step=100000
+                         label = "Population Régionale", value=17000000, step=100000
             ),
             
           
@@ -160,10 +160,16 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
+          h1("Nouvelles Admissions"),
+          h2("Projection du Nombre de cas par jour dans nos hopitaux"),
           sliderInput(inputId = "n_days",
                       label =  "Number of days to project", min=30, max=500, value=160, step=1
           ),
-           plotOutput("distPlot")
+           plotOutput("distPlot"),
+          h1("Occupation des ressources par jour"),
+          h2(
+            "Projection de la prise en charge en tenant compte des entrées et des sorties"
+          ),
         )
     )
 )
@@ -196,7 +202,7 @@ server <- function(input, output) {
     recovery_days=14 # incubation+etat c'est lamda
     gamma=1/recovery_days # gamma 1 sur lambda, le taux de personnes rétablies
     beta=(growth_rate+gamma)/N # taux de propagation (taux de personnes infectés après contact)
-    beta=beta/(1-distanciation) # taux de personnes infectées après contact en respectant les mesures barières
+    beta=beta*(1-distanciation) # taux de personnes infectées après contact en respectant les mesures barières
     R_0=beta/gamma*N # Taux de reproduction de base
     R_1=R_0/(1-distanciation) # Nouveau Taux de reproduction de base après mesures de distantiation sociale
     print(R_1)

@@ -21,7 +21,7 @@ growth_rate=2**(1/doubling_time)-1 # Pente de croissance
 recovery_days=14 # incubation+etat c'est lamda
 gamma=1/recovery_days # gamma 1 sur lambda, le taux de personnes rétablies
 beta=(growth_rate+gamma)/N # taux de propagation (taux de personnes infectés après contact)
-beta=beta/(1-distanciation) # taux de personnes infectées après contact en respectant les mesures barières
+beta=beta*(1-distanciation) # taux de personnes infectées après contact en respectant les mesures barières
 R_0=beta/gamma*N # Taux de reproduction de base
 R_1=R_0/(1-distanciation) # Nouveau Taux de reproduction de base après mesures de distantiation sociale
 print(R_1)

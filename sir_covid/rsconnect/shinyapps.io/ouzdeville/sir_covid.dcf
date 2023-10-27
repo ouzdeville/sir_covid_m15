@@ -5,7 +5,7 @@ account: ouzdeville
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 10330351
-bundleId: 7858867
+bundleId: 7861206
 url: https://ouzdeville.shinyapps.io/sir_covid/
 version: 1
 asMultiple: FALSE
